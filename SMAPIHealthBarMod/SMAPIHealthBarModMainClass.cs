@@ -41,7 +41,7 @@ namespace SMAPIHealthBarMod
 
         public override void Entry(params object[] objects)
         {
-            ModConfig = (HealthBarConfig)Config.InitializeConfig(BaseConfigPath, new HealthBarConfig());
+            ModConfig = (HealthBarConfig)Config.InitializeConfig(Config.GetBasePath(this), new HealthBarConfig());
             if (ModConfig.ColourScheme < 0) ModConfig.ColourScheme = 0;
             if (ModConfig.ColourScheme >= ColourSchemes.Length) ModConfig.ColourScheme = ColourSchemes.Length-1;
 

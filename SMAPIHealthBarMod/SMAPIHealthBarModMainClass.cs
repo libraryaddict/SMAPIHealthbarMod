@@ -162,6 +162,7 @@ namespace SMAPIHealthBarMod
                         }
                         else if (monster is RockGolem)
                         {
+                            if (monster.health == monster.maxHealth) continue;
                             monsterBox.Y = (int)monsterLocalPosition.Y - monster.sprite.spriteHeight * Game1.pixelZoom * 3 / 4;
                         }
                         else if(monster is Bug)
@@ -197,6 +198,7 @@ namespace SMAPIHealthBarMod
                         }
                         else if(monster is Skeleton || monster is ShadowBrute || monster is ShadowShaman || monster is SquidKid)
                         {
+                            if (monster.health == monster.maxHealth) continue;
                             monsterBox.Y -= 7 * Game1.pixelZoom;
                         }
                         monsterBox.X = (int)((float)monsterBox.X*Game1.options.zoomLevel);

@@ -6,13 +6,13 @@
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Storm is distributed in the hope that it will be useful,
+    Speeder's SDV Mods are distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Storm.  If not, see <http://www.gnu.org/licenses/>.
+    along with Speeder's SDV Mods.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 using Microsoft.Xna.Framework;
@@ -25,34 +25,26 @@ using System;
 
 namespace SMAPIHealthBarMod
 {
-    public class Class1 : Mod
+    public class SMAPIHealthBarModMainClass : Mod
     {
-        public override string Name
-        {
-            get { return "Health Bars Mod"; }
-        }
-
-        public override string Authour
-        {
-            get { return "Maurício Gomes (Speeder)"; }
-        }
-
-        public override string Version
-        {
-            get { return "0.9"; }
-        }
-
-        public override string Description
-        {
-            get { return "Add health bars to monsters."; }
-        }
-
         static Texture2D whitePixel;
         static RenderTarget2D renderTarget;
         static float lastZoomLevel;
 
+        public static HealthBarConfig ModConfig { get; protected set; }
+
+        static readonly Color[][] ColourSchemes =
+        {
+            new Color[] { Color.LawnGreen, Color.YellowGreen, Color.Gold, Color.DarkOrange, Color.Crimson },
+            new Color[] { Color.Crimson, Color.DarkOrange, Color.Gold, Color.YellowGreen, Color.LawnGreen },
+        };
+
         public override void Entry(params object[] objects)
         {
+            ModConfig = (HealthBarConfig)Config.InitializeConfig(BaseConfigPath, new HealthBarConfig());
+            if (ModConfig.ColourScheme < 0) ModConfig.ColourScheme = 0;
+            if (ModConfig.ColourScheme >= ColourSchemes.Length) ModConfig.ColourScheme = ColourSchemes.Length-1;
+
             GraphicsEvents.DrawTick += drawTickEvent;
             whitePixel = null;
         }
@@ -88,7 +80,7 @@ namespace SMAPIHealthBarMod
             {
                 Game1.graphics.GraphicsDevice.SetRenderTarget(null);                
             }*/
-            Game1.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+            Game1.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
             foreach (NPC character in Game1.currentLocation.characters)
             {
@@ -98,6 +90,7 @@ namespace SMAPIHealthBarMod
                 Rectangle lifeBox;
                 Vector2 monsterLocalPosition;
                 Color barColor;
+                String healthText;
                 float monsterHealthPercent;
                 float barLengthPercent;
                 int monsterKilledAmount;
@@ -113,25 +106,35 @@ namespace SMAPIHealthBarMod
                         {
                             monsterKilledAmount = Game1.stats.specificMonstersKilled[monster.name];
                         }
-                        else continue;
+                        else
+                        {
+                            monsterKilledAmount = 0;
+                        }
 
+                        healthText = "???";
                         if (monsterKilledAmount + Game1.player.combatLevel > 15)
                         {
                             //basic stats
                             monsterHealthPercent = (float)monster.health / (float)monster.maxHealth;
                             barLengthPercent = 1f;
-                            if (monsterHealthPercent > 0.9f) barColor = Color.Crimson;
-                            else if (monsterHealthPercent > 0.65f) barColor = Color.DarkOrange;                            
-                            else if (monsterHealthPercent > 0.35f) barColor = Color.Gold;
-                            else if (monsterHealthPercent > 0.15f) barColor = Color.YellowGreen;
-                            else barColor = Color.LawnGreen;
+                            if (monsterHealthPercent > 0.9f) barColor = ColourSchemes[ModConfig.ColourScheme][0];
+                            else if (monsterHealthPercent > 0.65f) barColor = ColourSchemes[ModConfig.ColourScheme][1];
+                            else if (monsterHealthPercent > 0.35f) barColor = ColourSchemes[ModConfig.ColourScheme][2];
+                            else if (monsterHealthPercent > 0.15f) barColor = ColourSchemes[ModConfig.ColourScheme][3];
+                            else barColor = ColourSchemes[ModConfig.ColourScheme][4];
 
                             if (monsterKilledAmount + Game1.player.combatLevel * 4 > 45)
                             {
-                                barLengthPercent = monsterHealthPercent;                                
+                                barLengthPercent = monsterHealthPercent;
+                                if (monster.health > 999) healthText = "!!!";
+                                else healthText = String.Format("{0:000}", monster.health);
                             }
                         }
-                        else continue;
+                        else
+                        {
+                            barLengthPercent = 1f;                            
+                            barColor = Color.DarkSlateGray;
+                        }
 
                         monsterLocalPosition = monster.getLocalPosition(Game1.viewport);
                         monsterBox = new Rectangle((int)monsterLocalPosition.X, (int)monsterLocalPosition.Y-monster.sprite.spriteHeight/2 * Game1.pixelZoom, monster.sprite.spriteWidth * Game1.pixelZoom, 12);
@@ -209,6 +212,10 @@ namespace SMAPIHealthBarMod
                         Game1.spriteBatch.Draw(whitePixel, lifeBox, Color.SaddleBrown);
                         lifeBox.Width = (int)((float)lifeBox.Width*barLengthPercent);
                         Game1.spriteBatch.Draw(whitePixel, lifeBox, barColor);
+                        if(barColor == Color.DarkSlateGray || barLengthPercent < 0.35f)
+                            Utility.drawTextWithShadow(Game1.spriteBatch, healthText, Game1.smallFont, new Vector2(monsterBox.X+(float)monsterBox.Width/2-9*Game1.options.zoomLevel, monsterBox.Y+2), Color.AntiqueWhite, Game1.options.zoomLevel*0.4f, -1, 0, 0, 0, 0);
+                        else
+                            Utility.drawTextWithShadow(Game1.spriteBatch, healthText, Game1.smallFont, new Vector2(monsterBox.X + (float)monsterBox.Width / 2 - 9 * Game1.options.zoomLevel, monsterBox.Y + 2), Color.DarkSlateGray, Game1.options.zoomLevel * 0.4f, -1, 0, 0, 0, 0);
                     }
                 }
             }
@@ -222,6 +229,17 @@ namespace SMAPIHealthBarMod
                 Game1.spriteBatch.Draw(renderTarget, Vector2.Zero, new Microsoft.Xna.Framework.Rectangle?(renderTarget.Bounds), new Color(255, 255, 255, 127), 0f, Vector2.Zero, Game1.options.zoomLevel, SpriteEffects.None, 1f);
                 Game1.spriteBatch.End();
             }*/
+        }
+    }
+
+    public class HealthBarConfig : Config
+    {
+        public int ColourScheme { get; set; }        
+
+        public override Config GenerateBaseConfig(Config baseConfig)
+        {
+            ColourScheme = 0;
+            return this;
         }
     }
 }

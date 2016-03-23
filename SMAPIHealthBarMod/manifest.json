@@ -1,0 +1,7 @@
+﻿{
+  "Name": "Health Bars Mod",
+  "Authour": "Maurício Gomes (Speeder)",
+  "Version": "1.5",
+  "Description": "Add health bars to monsters.",
+  "EntryDll":  "SMAPIHealthBarMod.dll"
+}

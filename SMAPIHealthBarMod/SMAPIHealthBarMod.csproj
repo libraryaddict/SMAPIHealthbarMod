@@ -81,6 +81,15 @@
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>SET STARDEWMODDIR="D:\\gog games\\Stardew Valley\\Mods\\$(ProjectName)"
+erase *.pdb
+copy ..\..\..\..\README.md README.md
+copy ..\..\..\..\screenshot.png screenshot.png
+copy ..\..\..\..\patreon_logo_shine100.png patreon_logo_shine100.png
+cd..
+xcopy $(ProjectName) %25STARDEWMODDIR%25 /S /I /Y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

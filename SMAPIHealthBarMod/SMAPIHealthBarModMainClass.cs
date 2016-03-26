@@ -28,8 +28,8 @@ namespace SMAPIHealthBarMod
     public class SMAPIHealthBarModMainClass : Mod
     {
         static Texture2D whitePixel;
-        static RenderTarget2D renderTarget;
-        static float lastZoomLevel;
+        //static RenderTarget2D renderTarget;
+        //static float lastZoomLevel;
 
         public static HealthBarConfig ModConfig { get; protected set; }
 

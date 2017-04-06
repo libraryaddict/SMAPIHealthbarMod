@@ -45,15 +45,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>SET STARDEWMODDIR="D:\\gog games\\Stardew Valley\\Mods\\$(ProjectName)"
-erase *.pdb
-copy ..\..\..\..\README.md README.md
-copy ..\..\..\..\screenshot.png screenshot.png
-copy ..\..\..\..\patreon_logo_shine100.png patreon_logo_shine100.png
-cd..
-xcopy $(ProjectName) %25STARDEWMODDIR%25 /S /I /Y</PostBuildEvent>
-  </PropertyGroup>
   <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.1.5.0\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.1.5.0\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -61,11 +52,16 @@ xcopy $(ProjectName) %25STARDEWMODDIR%25 /S /I /Y</PostBuildEvent>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.1.5.0\build\Pathoschild.Stardew.ModBuildConfig.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Pathoschild.Stardew.ModBuildConfig.1.5.0\build\Pathoschild.Stardew.ModBuildConfig.targets'))" />
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
   <Target Name="AfterBuild">
+    <PropertyGroup>
+      <ModPath>$(GamePath)\Mods\$(TargetName)</ModPath>
+    </PropertyGroup>
+    <Copy SourceFiles="$(TargetDir)\$(TargetName).dll" DestinationFolder="$(ModPath)" />
+    <Copy SourceFiles="$(TargetDir)\$(TargetName).pdb" DestinationFolder="$(ModPath)" Condition="Exists('$(TargetDir)\$(TargetName).pdb')" />
+    <Copy SourceFiles="$(TargetDir)\$(TargetName).dll.mdb" DestinationFolder="$(ModPath)" Condition="Exists('$(TargetDir)\$(TargetName).dll.mdb')" />
+    <Copy SourceFiles="$(ProjectDir)manifest.json" DestinationFolder="$(ModPath)" />
+    <Copy SourceFiles="$(SolutionDir)README.md" DestinationFolder="$(ModPath)" />
+    <Copy SourceFiles="$(SolutionDir)screenshot.png" DestinationFolder="$(ModPath)" />
+    <Copy SourceFiles="$(SolutionDir)patreon_logo_shine100.png" DestinationFolder="$(ModPath)" />
   </Target>
-  -->
 </Project>

@@ -26,7 +26,7 @@ using StardewValley.Monsters;
 namespace SMAPIHealthBarMod
 {
     /// <summary>The mod entry point.</summary>
-    public class SMAPIHealthBarModMainClass : Mod
+    public class HealthBarMod : Mod
     {
         /*********
         ** Properties

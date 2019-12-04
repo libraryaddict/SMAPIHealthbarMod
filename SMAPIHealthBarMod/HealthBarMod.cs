@@ -19,8 +19,8 @@ using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Netcode;
 using StardewModdingAPI;
-using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Monsters;
 
@@ -59,7 +59,7 @@ namespace SMAPIHealthBarMod
             if (this.Config.ColourScheme >= this.ColorSchemes.Length)
                 this.Config.ColourScheme = this.ColorSchemes.Length - 1;
 
-            GraphicsEvents.OnPostRenderEvent += this.GraphicsEvents_DrawTick;
+            this.Helper.Events.Display.Rendered += this.GraphicsEvents_DrawTick;
         }
 
 
@@ -79,21 +79,21 @@ namespace SMAPIHealthBarMod
             foreach (Monster monster in Game1.currentLocation.characters.OfType<Monster>())
             {
                 // skip if not visible
-                if (monster.isInvisible || !Utility.isOnScreen(monster.position, 3 * Game1.tileSize))
+                if (monster.IsInvisible || !Utility.isOnScreen(monster.position, 3 * Game1.tileSize))
                     continue;
 
                 // get monster data
-                int health = monster.health;
-                int maxHealth = Math.Max(monster.maxHealth, monster.health);
-                int numberKilled = Game1.stats.specificMonstersKilled.ContainsKey(monster.name)
-                    ? Game1.stats.specificMonstersKilled[monster.name]
+                int health = monster.Health;
+                int maxHealth = Math.Max(monster.MaxHealth, monster.Health);
+                int numberKilled = Game1.stats.specificMonstersKilled.ContainsKey(monster.Name)
+                    ? Game1.stats.specificMonstersKilled[monster.Name]
                     : 0;
                 string label = "???";
 
                 // get bar data
                 Color barColor;
                 float barLengthPercent;
-                if (numberKilled + Game1.player.combatLevel > 15)
+                if (numberKilled + Game1.player.combatLevel.Value > 15)
                 {
                     float monsterHealthPercent = health / (float)maxHealth;
                     barLengthPercent = 1f;
@@ -108,12 +108,12 @@ namespace SMAPIHealthBarMod
                     else
                         barColor = this.ColorSchemes[this.Config.ColourScheme][4];
 
-                    if (numberKilled + Game1.player.combatLevel * 4 > 45)
+                    if (numberKilled + Game1.player.combatLevel.Value * 4 > 45)
                     {
                         barLengthPercent = monsterHealthPercent;
-                        label = monster.health > 999
+                        label = monster.Health > 999
                             ? "!!!"
-                            : $"{monster.health:000}";
+                            : $"{monster.Health:000}";
                     }
                 }
                 else
@@ -124,15 +124,15 @@ namespace SMAPIHealthBarMod
 
                 // get monster position
                 Vector2 monsterLocalPosition = monster.getLocalPosition(Game1.viewport);
-                Rectangle monsterBox = new Rectangle((int)monsterLocalPosition.X, (int)monsterLocalPosition.Y - monster.sprite.spriteHeight / 2 * Game1.pixelZoom, monster.sprite.spriteWidth * Game1.pixelZoom, 12);
+                Rectangle monsterBox = new Rectangle((int)monsterLocalPosition.X, (int)monsterLocalPosition.Y - monster.Sprite.SpriteHeight / 2 * Game1.pixelZoom, monster.Sprite.SpriteWidth * Game1.pixelZoom, 12);
                 if (monster is GreenSlime slime)
                 {
-                    if (slime.hasSpecialItem)
+                    if (slime.hasSpecialItem.Value)
                     {
                         monsterBox.X -= 5;
                         monsterBox.Width += 10;
                     }
-                    else if (slime.cute)
+                    else if (slime.cute.Value)
                     {
                         monsterBox.X -= 2;
                         monsterBox.Width += 4;
@@ -142,29 +142,29 @@ namespace SMAPIHealthBarMod
                 }
                 else if (monster is RockCrab || monster is LavaCrab)
                 {
-                    if (monster.sprite.CurrentFrame % 4 == 0)
+                    if (monster.Sprite.CurrentFrame % 4 == 0)
                         continue;
                 }
                 else if (monster is RockGolem)
                 {
-                    if (monster.health == monster.maxHealth)
+                    if (monster.Health == monster.MaxHealth)
                         continue;
-                    monsterBox.Y = (int)monsterLocalPosition.Y - monster.sprite.spriteHeight * Game1.pixelZoom * 3 / 4;
+                    monsterBox.Y = (int)monsterLocalPosition.Y - monster.Sprite.SpriteHeight * Game1.pixelZoom * 3 / 4;
                 }
                 else if (monster is Bug bug)
                 {
-                    if (bug.isArmoredBug)
+                    if (bug.isArmoredBug.Value)
                         continue;
                     monsterBox.Y -= 15 * Game1.pixelZoom;
                 }
                 else if (monster is Grub)
                 {
-                    if (monster.sprite.CurrentFrame == 19)
+                    if (monster.Sprite.CurrentFrame == 19)
                         continue;
-                    monsterBox.Y = (int)monsterLocalPosition.Y - monster.sprite.spriteHeight * Game1.pixelZoom * 4 / 7;
+                    monsterBox.Y = (int)monsterLocalPosition.Y - monster.Sprite.SpriteHeight * Game1.pixelZoom * 4 / 7;
                 }
                 else if (monster is Fly)
-                    monsterBox.Y = (int)monsterLocalPosition.Y - monster.sprite.spriteHeight * Game1.pixelZoom * 5 / 7;
+                    monsterBox.Y = (int)monsterLocalPosition.Y - monster.Sprite.SpriteHeight * Game1.pixelZoom * 5 / 7;
                 else if (monster is DustSpirit)
                 {
                     monsterBox.X += 3;
@@ -173,7 +173,7 @@ namespace SMAPIHealthBarMod
                 }
                 else if (monster is Bat)
                 {
-                    if (monster.sprite.CurrentFrame == 4)
+                    if (monster.Sprite.CurrentFrame == 4)
                         continue;
                     monsterBox.X -= 1;
                     monsterBox.Width -= 2;
@@ -183,7 +183,7 @@ namespace SMAPIHealthBarMod
                     monsterBox.Y -= 2 * Game1.pixelZoom;
                 else if (monster is Skeleton || monster is ShadowBrute || monster is ShadowShaman || monster is SquidKid)
                 {
-                    if (monster.health == monster.maxHealth)
+                    if (monster.Health == monster.MaxHealth)
                         continue;
                     monsterBox.Y -= 7 * Game1.pixelZoom;
                 }

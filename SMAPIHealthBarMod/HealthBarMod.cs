@@ -92,7 +92,6 @@ namespace SMAPIHealthBarMod
                 int numberKilled = Game1.stats.specificMonstersKilled.ContainsKey(monster.Name)
                     ? Game1.stats.specificMonstersKilled[monster.Name]
                     : 0;
-                string label = "???";
 
                 // get bar data
                 Color barColor;
@@ -115,9 +114,6 @@ namespace SMAPIHealthBarMod
                     if (numberKilled + Game1.player.combatLevel.Value * 4 > 45)
                     {
                         barLengthPercent = monsterHealthPercent;
-                        label = monster.Health > 999
-                            ? "!!!"
-                            : $"{monster.Health:000}";
                     }
                 }
                 else
@@ -192,6 +188,13 @@ namespace SMAPIHealthBarMod
                     monsterBox.Y -= 7 * Game1.pixelZoom;
                 }
 
+                // Adjust for zoom
+                monsterBox.X = (int)(monsterBox.X * Game1.options.zoomLevel);
+                monsterBox.Y = (int)(monsterBox.Y * Game1.options.zoomLevel);
+               
+                monsterBox.Width = (int)(monsterBox.Width * Game1.options.zoomLevel);
+                monsterBox.Height = (int)(monsterBox.Height * Game1.options.zoomLevel);
+
                 // get health bar position
                 Rectangle healthBox = monsterBox;
                 ++healthBox.X;
@@ -204,10 +207,6 @@ namespace SMAPIHealthBarMod
                 Game1.spriteBatch.Draw(this.Pixel, healthBox, Color.SaddleBrown);
                 healthBox.Width = (int)(healthBox.Width * barLengthPercent);
                 Game1.spriteBatch.Draw(this.Pixel, healthBox, barColor);
-
-                // draw label
-                Color textColor = barColor == Color.DarkSlateGray || barLengthPercent < 0.35f ? Color.AntiqueWhite : Color.DarkSlateGray;
-                Utility.drawTextWithShadow(Game1.spriteBatch, label, Game1.smallFont, new Vector2(monsterBox.X + (float)monsterBox.Width / 2 - 9 * Game1.options.zoomLevel, monsterBox.Y + 2), textColor, Game1.options.zoomLevel * 0.4f, -1, 0, 0, 0, 0);
             }
         }
 

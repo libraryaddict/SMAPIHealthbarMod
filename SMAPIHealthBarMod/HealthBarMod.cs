@@ -189,11 +189,11 @@ namespace SMAPIHealthBarMod
                 }
 
                 // Adjust for zoom
-                monsterBox.X = (int)(monsterBox.X * Game1.options.zoomLevel);
-                monsterBox.Y = (int)(monsterBox.Y * Game1.options.zoomLevel);
+                monsterBox.X = (int)(monsterBox.X * (Game1.options.zoomLevel / Game1.options.uiScale));
+                monsterBox.Y = (int)(monsterBox.Y * (Game1.options.zoomLevel / Game1.options.uiScale));
                
-                monsterBox.Width = (int)(monsterBox.Width * Game1.options.zoomLevel);
-                monsterBox.Height = (int)(monsterBox.Height * Game1.options.zoomLevel);
+                monsterBox.Width = (int)(monsterBox.Width * (Game1.options.zoomLevel / Game1.options.uiScale));
+                monsterBox.Height = (int)(monsterBox.Height * (Game1.options.zoomLevel / Game1.options.uiScale));
 
                 // get health bar position
                 Rectangle healthBox = monsterBox;

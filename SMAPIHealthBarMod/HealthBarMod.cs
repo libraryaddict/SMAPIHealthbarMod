@@ -84,6 +84,10 @@ namespace SMAPIHealthBarMod
 
                 // get monster data
                 int health = monster.Health;
+
+                if (monster.MaxHealth < monster.Health)
+                    monster.MaxHealth = monster.Health;
+
                 int maxHealth = Math.Max(monster.MaxHealth, monster.Health);
                 int numberKilled = Game1.stats.specificMonstersKilled.ContainsKey(monster.Name)
                     ? Game1.stats.specificMonstersKilled[monster.Name]

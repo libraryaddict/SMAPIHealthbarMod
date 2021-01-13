@@ -71,8 +71,9 @@ namespace SMAPIHealthBarMod
         /// <param name="e">The event arguments.</param>
         private void GraphicsEvents_DrawTick(object sender, EventArgs e)
         {
-            if (!Game1.hasLoadedGame || Game1.currentMinigame != null || Game1.activeClickableMenu != null || Game1.isWarping || Game1.fadeIn)
+            if (!Game1.hasLoadedGame || Game1.currentMinigame != null || Game1.activeClickableMenu != null || Game1.isWarping || Game1.fadeIn || Game1.currentLocation == null)
                 return;
+
             if (this.Pixel == null)
                 this.Pixel = this.GetPixel();
 
